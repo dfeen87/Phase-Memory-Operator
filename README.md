@@ -187,7 +187,7 @@ phase-memory-operator/
 │   ├── requirements.txt               # Python dependencies
 │   └── replay_notes.md                # Deterministic replay instructions
 └── paper/
-    └── A_DETERMINISTIC_PHASE.MD       # Full paper
+    └── a_deterministic_phase.md       # Full paper
 ```
 
 ---
