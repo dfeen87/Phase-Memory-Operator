@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "A Deterministic Phase–Memory Operator for Hysteresis and Path-Dependent Regime Shifts"
+authors:
+  - family-names: Krüger
+    given-names: Marcel
+  - family-names: Feeney
+    given-names: Don
+year: 2026
+license: MIT
+repository-code: https://github.com/yourusername/phase-memory-operator
