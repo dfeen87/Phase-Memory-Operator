@@ -1,4 +1,4 @@
-# Phase-Memory Operator for Hysteresis and Path-Dependent Regime Shifts
+# Deterministic Phase-Memory Operator for Hysteresis and Path-Dependent Regime Shifts
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -20,7 +20,7 @@ This repository implements a **deterministic phase-memory operator** for detecti
 - ✅ **Auditable** - complete parameter logging and replay capability
 - ✅ **Supervisory** - designed as diagnostic layer, not controller
 - ✅ **Multi-timescale** - captures fast deviations, medium drift, slow memory
-- ✅ **Validated** - external validation on EEG collapse regimes
+- ✅ **Validated** - external validation on EEG ollapse-like regimes
 
 ---
 
@@ -113,6 +113,7 @@ Key principles:
 - ✅ Parameters frozen after calibration
 - ✅ Test phase run exactly once
 - ✅ Pre-declared metrics and falsification criteria
+- ✅ Calibration performed on a single contiguous window per experiment
 
 See [`calibration/calibration_protocol.md`](calibration/calibration_protocol.md) for detailed instructions.
 
@@ -122,11 +123,14 @@ See [`calibration/calibration_protocol.md`](calibration/calibration_protocol.md)
 
 ### External Validation: EEG Collapse Regimes
 
-We validated the operator on the **CHB-MIT scalp EEG database**, treating epileptic seizures as collapse-like regime shifts. The operator demonstrates strong predictive performance with:
+We validated the operator on the CHB-MIT scalp EEG database as a high-dimensional, nonstationary benchmark for collapse detection.
 
 - **ROC-AUC**: 0.87 (test set, locked parameters)
 - **Median lead time**: 15.3 seconds before event onset
 - **False alarm rate**: 0.10 alarms/second
+
+This validation is intended to assess the operator’s mathematical ability to detect impending regime shifts under drift and memory effects, not to claim biological or clinical
+transferability beyond the benchmark.
 
 **Reproducibility**: Full validation notebook available at [`validation/eeg_replay.ipynb`](validation/eeg_replay.ipynb)
 
@@ -223,10 +227,11 @@ If you use this work, please cite:
 
 ```bibtex
 @article{kruger2026phase,
-  title={A Deterministic Phase--Memory Operator for Hysteresis and Path-Dependent Regime Shifts: A Validation Protocol and Application Roadmap},
-  author={Kr{\"u}ger, Marcel and Feeney, Don},
-  journal={zenado preprint arXiv:XXXX.XXXXX},
-  year={2026}
+  title   = {A Deterministic Phase--Memory Operator for Hysteresis and Path-Dependent Regime Shifts: A Validation Protocol and Application Roadmap},
+  author  = {Kr{\"u}ger, Marcel and Feeney, Don},
+  journal = {Preprint},
+  note    = {Zenodo / arXiv},
+  year    = {2026}
 }
 ```
 
