@@ -9,3 +9,5 @@ To reproduce results:
 4. Run validation or test exactly once per protocol.
 
 Any deviation invalidates comparability.
+
+Optional development and documentation tools are intentionally excluded from the core requirements to preserve reproducibility.
