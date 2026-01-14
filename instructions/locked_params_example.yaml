@@ -1,0 +1,201 @@
+# Locked Parameters for Phase-Memory Operator
+# Generated: 2026-01-14
+# Dataset: Example EEG validation (CHB-MIT)
+# Status: FROZEN - DO NOT MODIFY
+
+metadata:
+  experiment_id: "eeg_val_001"
+  date_calibrated: "2026-01-14"
+  operator_version: "1.0.0"
+  commit_hash: "abc123def456"
+  python_version: "3.9.7"
+  
+# Data configuration
+data:
+  source: "CHB-MIT EEG Database"
+  subject_id: "chb01"
+  sampling_rate: 256.0  # Hz
+  duration_total: 3600.0  # seconds
+  
+  splits:
+    calibration:
+      start_time: 0.0
+      end_time: 1800.0
+      start_index: 0
+      end_index: 460800
+    validation:
+      start_time: 1800.0
+      end_time: 2700.0
+      start_index: 460800
+      end_index: 691200
+    test:
+      start_time: 2700.0
+      end_time: 3600.0
+      start_index: 691200
+      end_index: 921600
+
+# Signal preprocessing pipeline
+preprocessing:
+  channel_selection: ["Fp1-F7", "F7-T7"]  # Specific EEG channels
+  
+  filter_stage_1:
+    type: "butterworth"
+    order: 4
+    band_type: "bandpass"
+    low_cutoff: 0.5  # Hz
+    high_cutoff: 30.0  # Hz
+    zero_phase: true  # filtfilt
+    
+  artifact_rejection:
+    enabled: true
+    method: "amplitude_threshold"
+    threshold_std: 5.0  # Reject samples > 5 SD from mean
+    
+  normalization:
+    method: "z-score"
+    reference_window: [0, 1800.0]  # Use calibration window stats
+    mean: 0.0234
+    std: 12.456
+
+# Phase extraction
+phase_extraction:
+  method: "hilbert_transform"
+  unwrap: true
+  
+  reference_phase:
+    method: "mean_frequency"
+    baseline_window: [0.0, 600.0]  # First 10 minutes
+    baseline_indices: [0, 153600]
+    omega_ref: 12.3456  # rad/s (mean instantaneous frequency)
+    theta_ref_initial: 0.0
+    
+  quality_checks:
+    min_snr: 3.0
+    min_amplitude: 0.01
+
+# Triadic operator configuration
+triadic_operator:
+  U1_computation:
+    wrap_phase: true
+    wrap_period: 6.283185307179586  # 2π
+    
+  U2_computation:
+    differentiation_method: "gradient"  # numpy.gradient
+    
+  U3_computation:
+    integration_method: "trapezoidal"
+    t0_index: 0
+    weighting_function:
+      enabled: false  # No gating in this example
+      # If enabled, would specify SNR threshold, etc.
+
+# Stability functional weights
+stability_functional:
+  weights:
+    a: 0.4123  # U1 (phase deviation) weight
+    b: 0.3891  # U2 (drift rate) weight
+    c: 0.2764  # U3 (memory) weight
+    
+  normalization:
+    method: "L2"  # Weights normalized to unit L2 norm
+    
+  calibration:
+    method: "roc_auc_optimization"
+    optimization_algorithm: "Nelder-Mead"
+    objective_value: 0.8765  # Final ROC-AUC on calibration set
+    n_iterations: 87
+    convergence: true
+    
+  frozen: true
+
+# Alert policy
+alert_parameters:
+  J_threshold: 0.6543
+  dwell_time: 2.0  # seconds
+  dwell_samples: 512  # at 256 Hz
+  
+  calibration:
+    target_false_alarm_rate: 0.1  # alarms per second
+    achieved_false_alarm_rate: 0.0987
+    detection_rate: 0.92
+    median_lead_time: 15.3  # seconds
+    
+  frozen: true
+
+# Ground truth events (for test phase)
+events:
+  test_window:
+    - time: 2850.0
+      index: 729600
+      type: "seizure_onset"
+    - time: 3120.0
+      index: 798720
+      type: "seizure_onset"
+
+# Performance baseline comparisons
+baselines:
+  amplitude_threshold:
+    threshold: 3.0  # SD units
+    frozen: true
+    
+  spectral_power:
+    band: [4.0, 8.0]  # Hz
+    threshold: 2.5  # SD units
+    frozen: true
+
+# Reproducibility information
+reproducibility:
+  deterministic_seed: 42
+  
+  dependencies:
+    numpy: "1.21.0"
+    scipy: "1.7.1"
+    scikit-learn: "1.0.0"
+    
+  hardware:
+    platform: "linux"
+    cpu: "Intel Xeon"
+    
+  data_hash:
+    calibration: "sha256:abc123..."
+    validation: "sha256:def456..."
+    test: "sha256:ghi789..."
+
+# Validation metrics (on validation window - for reference only)
+validation_performance:
+  roc_auc: 0.8654
+  pr_auc: 0.7821
+  false_alarm_rate: 0.1123
+  median_lead_time: 14.8
+  detection_rate: 0.89
+  
+  perturbation_stability:
+    noise_level: 0.1  # fraction of signal std
+    n_trials: 5
+    auc_std: 0.0234  # Stability across perturbations
+
+# Test metrics (FINAL EVALUATION - run once)
+# This section should be EMPTY until test phase
+test_performance: {}
+  # Will be populated during final locked evaluation:
+  # roc_auc: 
+  # pr_auc:
+  # false_alarm_rate:
+  # median_lead_time:
+  # detection_rate:
+  # lead_times: []
+  # falsification_check: pass/fail
+
+# Audit trail
+audit:
+  parameter_freeze_date: "2026-01-14T10:30:00Z"
+  frozen_by: "researcher_id_001"
+  verification_hash: "sha256:xyz789abc..."
+  
+  modifications_log: []
+  # Any attempted modifications after freeze are logged here
+  
+  test_execution:
+    date: null  # To be filled when test is run
+    executed_by: null
+    single_execution_verified: false
