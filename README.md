@@ -187,7 +187,7 @@ phase-memory-operator/
 │   ├── requirements.txt               # Python dependencies
 │   └── replay_notes.md                # Deterministic replay instructions
 └── paper/
-    └── Nasa_O2_optimization_Update.pdf # Full paper
+    └── A Deterministic Phase–Memory   # Full paper
 ```
 
 ---
