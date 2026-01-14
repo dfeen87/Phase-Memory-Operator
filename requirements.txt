@@ -1,38 +1,19 @@
-# Phase-Memory Operator Dependencies
-# Python 3.9+ required
+# Phase-Memory Operator – Core Dependencies
+# Python >= 3.9
 
-# Core numerical computing
-numpy>=1.21.0,<2.0.0
-scipy>=1.7.0,<2.0.0
+# Core numerical computing (required)
+numpy>=1.21,<2.0
+scipy>=1.7,<2.0
 
-# Machine learning utilities (for metrics only)
-scikit-learn>=1.0.0,<2.0.0
+# Metrics utilities (optional but recommended for validation)
+scikit-learn>=1.0,<2.0
 
-# Data structures
-dataclasses>=0.6; python_version < "3.7"  # Built-in for Python 3.7+
+# YAML support for locked parameter files (recommended)
+pyyaml>=5.4
 
-# Optional: Jupyter for validation notebook
-jupyter>=1.0.0
-notebook>=6.4.0
-ipykernel>=6.0.0
+# Jupyter support (required to run validation notebooks)
+jupyter>=1.0
+ipykernel>=6.0
 
-# Optional: Plotting for visualization
-matplotlib>=3.4.0
-seaborn>=0.11.0
-
-# Optional: YAML for parameter files
-pyyaml>=5.4.0
-
-# Optional: HDF5 for large datasets
-h5py>=3.0.0
-
-# Development dependencies (testing, linting)
-pytest>=7.0.0
-pytest-cov>=3.0.0
-black>=22.0.0
-flake8>=4.0.0
-mypy>=0.950
-
-# Documentation
-sphinx>=4.0.0
-sphinx-rtd-theme>=1.0.0
+# Visualization (used in validation notebooks only)
+matplotlib>=3.4
