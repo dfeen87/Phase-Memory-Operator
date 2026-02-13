@@ -74,7 +74,8 @@ def apply_dwell_time_gate(
     warn = np.zeros(len(J), dtype=bool)
 
     for i in range(dwell_samples, len(J)):
-        # Check exactly dwell_samples + 1 consecutive samples (current sample + previous dwell_samples)
+        # Check dwell_samples + 1 consecutive samples:
+        # current sample at index i plus the previous dwell_samples samples
         if np.all(J[i - dwell_samples:i + 1] >= alert_params.J_threshold):
             warn[i] = True
 
@@ -93,7 +94,7 @@ def detect_warning_events(
 
     events: List[WarningEvent] = []
     in_event = False
-    onset_idx = 0
+    onset_idx = None
 
     for i, w in enumerate(warn):
         if w and not in_event:
@@ -101,19 +102,20 @@ def detect_warning_events(
             in_event = True
 
         elif not w and in_event:
-            J_window = J[onset_idx:i]
-            events.append(
-                WarningEvent(
-                    onset_time=t[onset_idx],
-                    onset_index=onset_idx,
-                    J_max=float(np.max(J_window)) if len(J_window) > 0 else 0.0,
-                    duration=float(t[i - 1] - t[onset_idx]),
-                    active=False,
+            if onset_idx is not None:
+                J_window = J[onset_idx:i]
+                events.append(
+                    WarningEvent(
+                        onset_time=t[onset_idx],
+                        onset_index=onset_idx,
+                        J_max=float(np.max(J_window)) if len(J_window) > 0 else 0.0,
+                        duration=float(t[i - 1] - t[onset_idx]),
+                        active=False,
+                    )
                 )
-            )
             in_event = False
 
-    if in_event and onset_idx < len(J):
+    if in_event and onset_idx is not None and onset_idx < len(J):
         J_window = J[onset_idx:]
         events.append(
             WarningEvent(
@@ -165,7 +167,8 @@ def compute_false_alarm_rate(
     for et in event_times:
         idx = min(np.searchsorted(t, et), len(t) - 1)
         start = max(0, idx - int(exclusion_window / dt))
-        exclusion[start:idx + 1] = True
+        end = min(idx + 1, len(exclusion))
+        exclusion[start:end] = True
 
     # Count warning *onsets* outside exclusion windows
     onsets = np.where(np.diff(warn.astype(int)) == 1)[0] + 1
@@ -180,6 +183,10 @@ def compute_false_alarm_rate(
         return 0.0
 
     return len(false_onsets) / active_time
+
+
+# Default percentile for fallback threshold when calibration fails
+FALLBACK_THRESHOLD_PERCENTILE = 50
 
 
 def calibrate_alert_threshold(
@@ -224,7 +231,7 @@ def calibrate_alert_threshold(
 
     # Fallback to median if no suitable threshold found
     if best is None:
-        best = float(np.percentile(J_cal, 50))
+        best = float(np.percentile(J_cal, FALLBACK_THRESHOLD_PERCENTILE))
 
     alert_params = AlertParameters(J_threshold=float(best), dwell_time=dwell_time)
 
