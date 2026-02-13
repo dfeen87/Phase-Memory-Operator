@@ -70,6 +70,9 @@ def analytic_signal(s: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     if s.ndim != 1:
         raise ValueError("Signal must be one-dimensional")
 
+    if len(s) == 0:
+        raise ValueError("Signal must be non-empty")
+
     if np.any(np.isnan(s)) or np.any(np.isinf(s)):
         raise ValueError("Signal contains NaN or Inf values")
 
