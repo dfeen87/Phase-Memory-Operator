@@ -74,6 +74,7 @@ def apply_dwell_time_gate(
     warn = np.zeros(len(J), dtype=bool)
 
     for i in range(dwell_samples, len(J)):
+        # Check exactly dwell_samples + 1 consecutive samples (current sample + previous dwell_samples)
         if np.all(J[i - dwell_samples:i + 1] >= alert_params.J_threshold):
             warn[i] = True
 
@@ -92,7 +93,7 @@ def detect_warning_events(
 
     events: List[WarningEvent] = []
     in_event = False
-    onset_idx = None
+    onset_idx = 0
 
     for i, w in enumerate(warn):
         if w and not in_event:
@@ -105,20 +106,20 @@ def detect_warning_events(
                 WarningEvent(
                     onset_time=t[onset_idx],
                     onset_index=onset_idx,
-                    J_max=float(np.max(J_window)),
+                    J_max=float(np.max(J_window)) if len(J_window) > 0 else 0.0,
                     duration=float(t[i - 1] - t[onset_idx]),
                     active=False,
                 )
             )
             in_event = False
 
-    if in_event:
+    if in_event and onset_idx < len(J):
         J_window = J[onset_idx:]
         events.append(
             WarningEvent(
                 onset_time=t[onset_idx],
                 onset_index=onset_idx,
-                J_max=float(np.max(J_window)),
+                J_max=float(np.max(J_window)) if len(J_window) > 0 else 0.0,
                 duration=float(t[-1] - t[onset_idx]),
                 active=True,
             )
@@ -138,10 +139,10 @@ def compute_lead_times(
     lead_times = []
 
     for event_t in event_times:
-        event_idx = np.searchsorted(t, event_t)
+        event_idx = min(np.searchsorted(t, event_t), len(t) - 1)
         warning_indices = np.where(warn[:event_idx])[0]
 
-        if len(warning_indices) > 0:
+        if len(warning_indices) > 0 and warning_indices[0] < len(t):
             lead_times.append(event_t - t[warning_indices[0]])
         else:
             lead_times.append(np.nan)
@@ -162,17 +163,21 @@ def compute_false_alarm_rate(
     exclusion = np.zeros(len(t), dtype=bool)
 
     for et in event_times:
-        idx = np.searchsorted(t, et)
+        idx = min(np.searchsorted(t, et), len(t) - 1)
         start = max(0, idx - int(exclusion_window / dt))
-        exclusion[start:idx] = True
+        exclusion[start:idx + 1] = True
 
     # Count warning *onsets* outside exclusion windows
     onsets = np.where(np.diff(warn.astype(int)) == 1)[0] + 1
-    false_onsets = [i for i in onsets if not exclusion[i]]
+    false_onsets = [i for i in onsets if i < len(exclusion) and not exclusion[i]]
 
     total_time = t[-1] - t[0]
     excluded_time = np.sum(exclusion) * dt
     active_time = max(total_time - excluded_time, dt)
+
+    # Prevent division by zero
+    if active_time <= 0:
+        return 0.0
 
     return len(false_onsets) / active_time
 
@@ -216,6 +221,10 @@ def calibrate_alert_threshold(
 
         if abs(far - target_far) <= tolerance:
             break
+
+    # Fallback to median if no suitable threshold found
+    if best is None:
+        best = float(np.percentile(J_cal, 50))
 
     alert_params = AlertParameters(J_threshold=float(best), dwell_time=dwell_time)
 

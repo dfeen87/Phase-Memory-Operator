@@ -215,8 +215,13 @@ def calibrate_weights_grid(
     a_opt, b_opt, c_opt = best_weights
 
     # Normalize to unit L2 norm (interpretability; scale absorbed by threshold Jc)
-    norm = float(np.sqrt(a_opt**2 + b_opt**2 + c_opt**2) + 1e-12)
-    a_opt, b_opt, c_opt = a_opt / norm, b_opt / norm, c_opt / norm
+    norm = float(np.sqrt(a_opt**2 + b_opt**2 + c_opt**2))
+    if norm < 1e-12:
+        # If all weights are zero or calibration failed, use equal weights
+        warnings.warn("No valid weights found during calibration; using default equal weights")
+        a_opt, b_opt, c_opt = 1.0/np.sqrt(3), 1.0/np.sqrt(3), 1.0/np.sqrt(3)
+    else:
+        a_opt, b_opt, c_opt = a_opt / norm, b_opt / norm, c_opt / norm
 
     params = StabilityParameters(a=a_opt, b=b_opt, c=c_opt)
 

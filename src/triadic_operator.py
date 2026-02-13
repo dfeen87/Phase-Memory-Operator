@@ -94,10 +94,15 @@ def compute_U3(
     if U1.shape != w.shape:
         raise ValueError("U1 and w must have the same shape")
 
+    if not 0 <= t0_idx < len(U1):
+        raise ValueError(f"t0_idx {t0_idx} out of bounds [0, {len(U1)-1}]")
+
     U3 = np.zeros_like(U1)
 
     for i in range(max(t0_idx + 1, 1), len(U1)):
         dt = t[i] - t[i - 1]
+        if dt <= 0:
+            raise ValueError(f"Non-monotonic time at index {i}: dt = {dt}")
         U3[i] = U3[i - 1] + 0.5 * dt * (
             w[i] * U1[i] + w[i - 1] * U1[i - 1]
         )
