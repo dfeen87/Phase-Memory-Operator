@@ -266,7 +266,7 @@ MIT License - see [`LICENSE`](LICENSE) file.
 
 External validation data: CHB-MIT Scalp EEG Database (Shoeb, 2009)
 
-Related work: Deterministic trust middleware available at [AILEE-Trust-Layer](https://github.com/dfeen87/AILEE-Trust-Layer)
+This project was developed with a combination of original ideas and math, hands‑on coding, and support from advanced AI systems. I would like to acknowledge **Microsoft Copilot**, **OpenAI ChatGPT** and **Anthropic Claude**, for their meaningful assistance in refining concepts, improving clarity, and strengthening the overall quality of this work.
 
 ---
 
