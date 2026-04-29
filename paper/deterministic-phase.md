@@ -302,10 +302,10 @@ These results should be interpreted as an illustrative controlled demonstration 
 
 | Method | Lead time | False alarms | ROC-AUC | Stability |
 |--------|-----------|--------------|---------|-----------|
-| Amplitude threshold | [insert] | [insert] | [insert] | [insert] |
-| Drift-only baseline | [insert] | [insert] | [insert] | [insert] |
-| U₁ + U₂ only | [insert] | [insert] | [insert] | [insert] |
-| Phase–memory operator (U₁, U₂, U₃) | [insert] | [insert] | [insert] | [insert] |
+| Amplitude threshold | 0.00 s | 0 | 0.209 | 1.000 |
+| Drift-only baseline | 0.00 s | 0 | 0.487 | 0.992 |
+| U₁ + U₂ only | 0.00 s | 1 | 0.273 | 0.999 |
+| Phase–memory operator (U₁, U₂, U₃) | 0.00 s | 2 | 0.153 | 0.999 |
 
 ### 7.7 Interpretation Boundary
 
