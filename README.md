@@ -29,7 +29,7 @@ This repository implements a **deterministic phase-memory operator** for detecti
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/phase-memory-operator.git
+git clone https://github.com/dfeen87/phase-memory-operator.git
 cd phase-memory-operator
 pip install -r reproducibility/requirements.txt
 ```
